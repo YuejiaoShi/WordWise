@@ -1,10 +1,10 @@
-import { Link } from "react-router-dom";
+import PageNav from "../components/PageNav";
 
 function Homepage() {
   return (
     <div>
-      <Link to="/pricing">Pricing Page</Link>
-      <Link to="/produce">Produce Page</Link>
+      <PageNav />
+      <h1>WorldWise</h1>
     </div>
   );
 }
