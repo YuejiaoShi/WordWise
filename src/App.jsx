@@ -12,7 +12,7 @@ import CityList from "./components/CityList";
 const BASE_URL = "http://localhost:8000";
 
 function App() {
-  const [cities, setCities] = useState({});
+  const [cities, setCities] = useState([]);
   const [isLoading, setIsLoading] = useState(false);
 
   useEffect(function () {
@@ -20,7 +20,8 @@ function App() {
       try {
         setIsLoading(true);
         const res = await fetch(`${BASE_URL}/cities`);
-        const data = res.json();
+        const data = await res.json();
+        console.log(data);
         setCities(data);
       } catch {
         alert("Error for Loading Data...");
@@ -41,7 +42,10 @@ function App() {
           <Route path="app" element={<AppLayout />}>
             <Route index element={<p>List</p>} />
 
-            <Route path="cities" element={<CityList />} />
+            <Route
+              path="cities"
+              element={<CityList cities={cities} isLoading={isLoading} />}
+            />
             <Route path="countries" element={<p>Countries</p>} />
             <Route path="form" element={<p>Form</p>} />
           </Route>
