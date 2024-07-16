@@ -8,7 +8,6 @@ function Map() {
   const lng = searchParams.get("lng");
   // eslint-disable-next-line no-console
   console.log(lat);
-  // setSearchParams();
 
   return (
     <div className={styles.mapContainer}>
