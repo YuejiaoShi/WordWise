@@ -1,23 +1,31 @@
 /* eslint-disable */
-import { useSearchParams } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import styles from "./Map.module.css";
+import { MapContainer, TileLayer, Marker, Popup } from "react-leaflet";
+import { useState } from "react";
 
 function Map() {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const lat = searchParams.get("lat");
-  const lng = searchParams.get("lng");
-  // eslint-disable-next-line no-console
-  console.log(lat);
+  const navigate = useNavigate();
+  const [mapPosition, setMapPosition] = useState([40, 0]);
 
   return (
     <div className={styles.mapContainer}>
-      <h1>Map</h1>
-      <h6>
-        {lat},{lng}
-      </h6>
-      <button onClick={() => setSearchParams({ lat: 20, lng: 20 })}>
-        Change position to 20,20
-      </button>
+      <MapContainer
+        center={mapPosition}
+        zoom={13}
+        scrollWheelZoom={true}
+        className={styles.map}
+      >
+        <TileLayer
+          attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
+          url="https://{s}.tile.openstreetmap.fr/hot/{z}/{x}/{y}.png"
+        />
+        <Marker position={mapPosition}>
+          <Popup>
+            A pretty CSS3 popup. <br /> Easily customizable.
+          </Popup>
+        </Marker>
+      </MapContainer>
     </div>
   );
 }
