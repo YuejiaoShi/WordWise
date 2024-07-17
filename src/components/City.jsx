@@ -17,8 +17,6 @@ function City() {
   const { id } = useParams();
   const { getCity, currentCity, isLoading } = useCities();
 
-  if (isLoading) return <Spinner />;
-  
   useEffect(
     function () {
       getCity(id);
@@ -28,6 +26,7 @@ function City() {
 
   const { cityName, emoji, date, notes } = currentCity;
 
+  if (isLoading) return <Spinner />;
   return (
     <div className={styles.city}>
       <div className={styles.row}>
