@@ -9,6 +9,7 @@ import { useNavigate } from "react-router-dom";
 import BackButton from "./BackButton";
 import { useUrlPosition } from "../hooks/useUrlPosition";
 import Message from "./Message";
+import Spinner from "./Spinner";
 
 export function convertToEmoji(countryCode) {
   const codePoints = countryCode
@@ -33,6 +34,7 @@ function Form() {
 
   useEffect(
     function () {
+      if (!lat && !lng) return;
       async function fetchCityData() {
         try {
           setIsLoadingGeocoding(true);
@@ -61,8 +63,12 @@ function Form() {
     [lat, lng]
   );
   
-  if (geocodingError) return <Message message={geocodingError} />;
+  if (isLoadingGeocoding) return <Spinner />;
 
+  if (!lat && !lng)
+    return <Message message={"Start by clicking somewhere on the map"} />;
+
+  if (geocodingError) return <Message message={geocodingError} />;
 
   return (
     <form className={styles.form}>
