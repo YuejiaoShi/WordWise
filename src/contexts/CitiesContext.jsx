@@ -10,16 +10,24 @@ function reducer(state, action) {
       return { ...state, isLoading: true };
     case "cities/loaded":
       return { ...state, isLoading: false, currentCity: action.payload };
-    case "cities/created":
-      return { ...state, isLoading: false, cities: [...state.cities, payload] };
-
-    case "cities/deleted":
-      return { ...state, isLoading: false, cities: [...state.cities, payload] };
-
+    case "city/loaded":
+      return { ...state, isLoading: false, currentCity: action.payload };
+    case "city/created":
+      return {
+        ...state,
+        isLoading: false,
+        cities: [...state.cities, action.payload],
+      };
+    case "city/deleted":
+      return {
+        ...state,
+        isLoading: false,
+        cities: state.cities.filter((city) => city.id !== action.payload),
+      };
     case "rejected":
       return { ...state, isLoading: false, error: action.payload };
     default:
-      throw new Error("Unknow action type");
+      throw new Error("Unknown action type");
   }
 }
 const initialState = {
@@ -72,23 +80,21 @@ function CitiesProvider({ children }) {
         headers: { "Content-Type": "application/json" },
       });
       const data = await res.json();
-      setCities((cities) => [...cities, data]);
+      dispatch({ type: "city/created", payload: data });
     } catch {
-      alert("Error for Creating City...");
+      dispatch({ type: "rejected", payload: "Error for Creating City..." });
     }
   }
 
   async function deleteCity(id) {
+    dispatch({ type: "loading" });
     try {
-      setIsLoading(true);
       await fetch(`${BASE_URL}/cities/${id}`, {
         method: "DELETE",
       });
-      setCities((cities) => cities.filter((city) => city.id !== id));
+      dispatch({ type: "city/deleted", payload: id });
     } catch {
-      alert("Error for Deleting Data...");
-    } finally {
-      setIsLoading(false);
+      dispatch({ type: "rejected", payload: "Error for Deleting City..." });
     }
   }
 
