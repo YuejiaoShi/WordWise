@@ -12,11 +12,16 @@ const CitiesContext = createContext();
 
 function reducer(state, action) {
   switch (action.type) {
+    case "loading":
+      return { ...state, isLoading: true };
     case "cities/loaded":
-
+      return { ...state, isLoading: false, cities: action.payload };
     case "cities/created":
 
     case "cities/deleted":
+
+    default:
+      throw new Error("Unknow action type");
   }
 }
 const initialState = { cities: [], isLoading: false, currentCity: {} };
@@ -32,15 +37,13 @@ function CitiesProvider({ children }) {
 
   useEffect(function () {
     async function fetchCities() {
+      dispatch({ type: "loading" });
       try {
-        setIsLoading(true);
         const res = await fetch(`${BASE_URL}/cities`);
         const data = await res.json();
-        setCities(data);
+        dispatch({ type: "cities/loaded", payload: data });
       } catch {
         alert("Error for Loading Data...");
-      } finally {
-        setIsLoading(false);
       }
     }
     fetchCities();
