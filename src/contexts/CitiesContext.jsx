@@ -9,10 +9,12 @@ function reducer(state, action) {
     case "loading":
       return { ...state, isLoading: true };
     case "cities/loaded":
-      return { ...state, isLoading: false, cities: action.payload };
+      return { ...state, isLoading: false, currentCity: action.payload };
     case "cities/created":
+      return { ...state, isLoading: false, cities: [...state.cities, payload] };
 
     case "cities/deleted":
+      return { ...state, isLoading: false, cities: [...state.cities, payload] };
 
     case "rejected":
       return { ...state, isLoading: false, error: action.payload };
@@ -51,21 +53,19 @@ function CitiesProvider({ children }) {
   }, []);
 
   async function getCity(id) {
+    dispatch({ type: "loading" });
     try {
-      setIsLoading(true);
       const res = await fetch(`${BASE_URL}/cities/${id}`);
       const data = await res.json();
-      setCurrentCity(data);
+      dispatch({ type: "city/loaded", payload: data });
     } catch {
-      alert("Error for Loading Data...");
-    } finally {
-      setIsLoading(false);
+      dispatch({ type: "rejected", payload: "Error for Loading Data..." });
     }
   }
 
   async function createCity(newCity) {
+    dispatch({ type: "loading" });
     try {
-      setIsLoading(true);
       const res = await fetch(`${BASE_URL}/cities`, {
         method: "POST",
         body: JSON.stringify(newCity),
@@ -75,8 +75,6 @@ function CitiesProvider({ children }) {
       setCities((cities) => [...cities, data]);
     } catch {
       alert("Error for Creating City...");
-    } finally {
-      setIsLoading(false);
     }
   }
 
