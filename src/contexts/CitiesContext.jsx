@@ -1,10 +1,4 @@
-import {
-  createContext,
-  useState,
-  useEffect,
-  useContext,
-  useReducer,
-} from "react";
+import { createContext, useEffect, useContext, useReducer } from "react";
 /* eslint-disable react/prop-types */
 
 const BASE_URL = "http://localhost:8000";
@@ -20,11 +14,18 @@ function reducer(state, action) {
 
     case "cities/deleted":
 
+    case "rejected":
+      return { ...state, isLoading: false, error: action.payload };
     default:
       throw new Error("Unknow action type");
   }
 }
-const initialState = { cities: [], isLoading: false, currentCity: {} };
+const initialState = {
+  cities: [],
+  isLoading: false,
+  currentCity: {},
+  error: "",
+};
 
 function CitiesProvider({ children }) {
   const [{ cities, isLoading, currentCity }, dispatch] = useReducer(
@@ -43,7 +44,7 @@ function CitiesProvider({ children }) {
         const data = await res.json();
         dispatch({ type: "cities/loaded", payload: data });
       } catch {
-        alert("Error for Loading Data...");
+        dispatch({ type: "rejected", payload: "Error for Loading Data..." });
       }
     }
     fetchCities();
