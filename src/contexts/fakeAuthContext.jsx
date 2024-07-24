@@ -24,7 +24,11 @@ function AuthProvider({ children }) {
   function login(email, password) {}
   function logout() {}
 
-  return <AuthContext.Provider>{children}</AuthContext.Provider>;
+  return (
+    <AuthContext.Provider value={{ user, isAuthenticated, login, logout }}>
+      {children}
+    </AuthContext.Provider>
+  );
 }
 
 function useAuth() {
