@@ -1,5 +1,5 @@
 import { createContext, useContext, useReducer } from "react";
-
+/* eslint-disable react/prop-types */
 const AuthContext = createContext();
 
 const initialState = { user: null, isAuthenticated: false };
