@@ -24,7 +24,6 @@ const Login = lazy(() => import("./pages/Login"));
 const AppLayout = lazy(() => import("./pages/AppLayout"));
 const PageNotFound = lazy(() => import("./pages/PageNotFound"));
 
-
 function App() {
   return (
     <AuthProvider>
@@ -44,7 +43,6 @@ function App() {
                 }
               >
                 <Route index element={<Navigate replace to="cities" />} />
-                <Route path="/" element={<Homepage />} />
                 <Route path="cities" element={<CityList />} />
                 <Route path="cities/:id" element={<City />} />
                 <Route path="countries" element={<CountryList />} />
