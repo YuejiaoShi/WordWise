@@ -6,8 +6,8 @@ import {
   useCallback,
 } from "react";
 /* eslint-disable react/prop-types */
-
-const BASE_URL = "http://localhost:8000";
+const BASE_URL = process.env.BASE_URL;
+// const BASE_URL = "http://localhost:8000";
 const CitiesContext = createContext();
 
 function reducer(state, action) {
