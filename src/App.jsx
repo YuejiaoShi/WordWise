@@ -31,7 +31,7 @@ function App() {
         <BrowserRouter>
           <Suspense fallback={<SpinnerFullPage />}>
             <Routes>
-              <Route index element={<Homepage />} />
+              {/* <Route index element={<Homepage />} /> */}
               <Route path="/" element={<Homepage />} />
               <Route path="product" element={<Product />} />
               <Route path="pricing" element={<Pricing />} />
