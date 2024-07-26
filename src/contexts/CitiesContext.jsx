@@ -6,7 +6,7 @@ import {
   useCallback,
 } from "react";
 /* eslint-disable react/prop-types */
-const BASE_URL =  process.env.APIpath;
+const BASE_URL =  process.env.VERCEL_URL;
 // const BASE_URL = "http://localhost:8000";
 const CitiesContext = createContext();
 
