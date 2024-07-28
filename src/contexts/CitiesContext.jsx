@@ -6,22 +6,13 @@ import {
   useCallback,
 } from "react";
 
-import { initializeApp } from "firebase/app";
-import {
-  getFirestore,
-  collection,
-  getDocs,
-  doc,
-  getDoc,
-  addDoc,
-  deleteDoc,
-} from "firebase/firestore";
+import { database } from "./firebaseConfig";
+import { ref, get, set, push, remove } from "firebase/database";
 
 /* eslint-disable react/prop-types */
 // const BASE_URL =  "https://word-wise-five.vercel.app:8000";
 // const BASE_URL = "http://localhost:8000";
 
-// Initialize Firebase
 const firebaseConfig = {
   apiKey: "AIzaSyAy3Hn5i5e9w4MpVr__R8G1UGcAWwZWwpo",
   authDomain: "worldwise-6e045.firebaseapp.com",
@@ -31,8 +22,6 @@ const firebaseConfig = {
   appId: "1:869575787510:web:a3e5f583232ce8cd09bdd7",
   measurementId: "G-6QXX2Q1MXK",
 };
-const app = initializeApp(firebaseConfig);
-const db = getFirestore(app);
 
 const CitiesContext = createContext();
 
@@ -100,13 +89,20 @@ function CitiesProvider({ children }) {
       dispatch({ type: "loading" });
       try {
         // const res = await fetch(`${BASE_URL}/cities`);
-        const querySnapshot = await getDocs(collection(db, "cities"));
         // const data = await res.json();
-        const data = querySnapshot.docs.map((doc) => ({
-          ...doc.data(),
-          id: doc.id,
-        }));
-        dispatch({ type: "cities/loaded", payload: data });
+        // dispatch({ type: "cities/loaded", payload: data });
+        const citiesRef = ref(database, "cities");
+        const snapshot = await get(citiesRef);
+        if (snapshot.exists()) {
+          const data = snapshot.val();
+          const cities = Object.keys(data).map((key) => ({
+            id: key,
+            ...data[key],
+          }));
+          dispatch({ type: "cities/loaded", payload: cities });
+        } else {
+          dispatch({ type: "cities/loaded", payload: [] });
+        }
       } catch {
         dispatch({ type: "rejected", payload: "Error for Loading Data..." });
       }
@@ -121,17 +117,14 @@ function CitiesProvider({ children }) {
       dispatch({ type: "loading" });
       try {
         // const res = await fetch(`${BASE_URL}/cities/${id}`);
-        const docRef = doc(db, "cities", id);
         // const data = await res.json();
-        const docSnap = await getDoc(docRef);
         // dispatch({ type: "city/loaded", payload: data });
-        if (docSnap.exists()) {
-          dispatch({
-            type: "city/loaded",
-            payload: { ...docSnap.data(), id: docSnap.id },
-          });
+        const cityRef = ref(database, `cities/${id}`);
+        const snapshot = await get(cityRef);
+        if (snapshot.exists()) {
+          dispatch({ type: "city/loaded", payload: { id, ...snapshot.val() } });
         } else {
-          throw new Error("No such document!");
+          dispatch({ type: "rejected", payload: "City not found..." });
         }
       } catch {
         dispatch({ type: "rejected", payload: "Error for Loading Data..." });
@@ -149,11 +142,15 @@ function CitiesProvider({ children }) {
       //   headers: { "Content-Type": "application/json" },
       // });
       // const data = await res.json();
-      const docRef = await addDoc(collection(db, "cities"), newCity);
-      const docSnap = await getDoc(docRef);
       // dispatch({ type: "city/created", payload: data });
-      dispatch({ type: "city/created", payload: { ...docSnap.data(), id: docSnap.id } });
-
+      const citiesRef = ref(database, "cities");
+      const newCityWithIdAndDate = {
+        ...newCity,
+        id: `${new Date().getTime()}`, // Generate a unique ID
+        date: new Date().toISOString(), // Set the current date
+      };
+      await push(citiesRef, newCityWithIdAndDate);
+      dispatch({ type: "city/created", payload: newCityWithIdAndDate });
     } catch {
       dispatch({ type: "rejected", payload: "Error for Creating City..." });
     }
@@ -165,7 +162,9 @@ function CitiesProvider({ children }) {
       // await fetch(`${BASE_URL}/cities/${id}`, {
       //   method: "DELETE",
       // });
-      await deleteDoc(doc(db, "cities", id));
+      // dispatch({ type: "city/deleted", payload: id });
+      const cityRef = ref(database, `cities/${id}`);
+      await remove(cityRef);
       dispatch({ type: "city/deleted", payload: id });
     } catch {
       dispatch({ type: "rejected", payload: "Error for Deleting City..." });
