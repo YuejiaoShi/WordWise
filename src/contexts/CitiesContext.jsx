@@ -5,9 +5,35 @@ import {
   useReducer,
   useCallback,
 } from "react";
+
+import { initializeApp } from "firebase/app";
+import {
+  getFirestore,
+  collection,
+  getDocs,
+  doc,
+  getDoc,
+  addDoc,
+  deleteDoc,
+} from "firebase/firestore";
+
 /* eslint-disable react/prop-types */
 // const BASE_URL =  "https://word-wise-five.vercel.app:8000";
-const BASE_URL = "http://localhost:8000";
+// const BASE_URL = "http://localhost:8000";
+
+// Initialize Firebase
+const firebaseConfig = {
+  apiKey: "AIzaSyAy3Hn5i5e9w4MpVr__R8G1UGcAWwZWwpo",
+  authDomain: "worldwise-6e045.firebaseapp.com",
+  projectId: "worldwise-6e045",
+  storageBucket: "worldwise-6e045.appspot.com",
+  messagingSenderId: "869575787510",
+  appId: "1:869575787510:web:a3e5f583232ce8cd09bdd7",
+  measurementId: "G-6QXX2Q1MXK",
+};
+const app = initializeApp(firebaseConfig);
+const db = getFirestore(app);
+
 const CitiesContext = createContext();
 
 function reducer(state, action) {
@@ -73,8 +99,13 @@ function CitiesProvider({ children }) {
     async function fetchCities() {
       dispatch({ type: "loading" });
       try {
-        const res = await fetch(`${BASE_URL}/cities`);
-        const data = await res.json();
+        // const res = await fetch(`${BASE_URL}/cities`);
+        const querySnapshot = await getDocs(collection(db, "cities"));
+        // const data = await res.json();
+        const data = querySnapshot.docs.map((doc) => ({
+          ...doc.data(),
+          id: doc.id,
+        }));
         dispatch({ type: "cities/loaded", payload: data });
       } catch {
         dispatch({ type: "rejected", payload: "Error for Loading Data..." });
@@ -89,9 +120,19 @@ function CitiesProvider({ children }) {
 
       dispatch({ type: "loading" });
       try {
-        const res = await fetch(`${BASE_URL}/cities/${id}`);
-        const data = await res.json();
-        dispatch({ type: "city/loaded", payload: data });
+        // const res = await fetch(`${BASE_URL}/cities/${id}`);
+        const docRef = doc(db, "cities", id);
+        // const data = await res.json();
+        const docSnap = await getDoc(docRef);
+        // dispatch({ type: "city/loaded", payload: data });
+        if (docSnap.exists()) {
+          dispatch({
+            type: "city/loaded",
+            payload: { ...docSnap.data(), id: docSnap.id },
+          });
+        } else {
+          throw new Error("No such document!");
+        }
       } catch {
         dispatch({ type: "rejected", payload: "Error for Loading Data..." });
       }
