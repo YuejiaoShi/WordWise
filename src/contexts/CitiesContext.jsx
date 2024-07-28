@@ -143,13 +143,17 @@ function CitiesProvider({ children }) {
   async function createCity(newCity) {
     dispatch({ type: "loading" });
     try {
-      const res = await fetch(`${BASE_URL}/cities`, {
-        method: "POST",
-        body: JSON.stringify(newCity),
-        headers: { "Content-Type": "application/json" },
-      });
-      const data = await res.json();
-      dispatch({ type: "city/created", payload: data });
+      // const res = await fetch(`${BASE_URL}/cities`, {
+      //   method: "POST",
+      //   body: JSON.stringify(newCity),
+      //   headers: { "Content-Type": "application/json" },
+      // });
+      // const data = await res.json();
+      const docRef = await addDoc(collection(db, "cities"), newCity);
+      const docSnap = await getDoc(docRef);
+      // dispatch({ type: "city/created", payload: data });
+      dispatch({ type: "city/created", payload: { ...docSnap.data(), id: docSnap.id } });
+
     } catch {
       dispatch({ type: "rejected", payload: "Error for Creating City..." });
     }
@@ -158,9 +162,10 @@ function CitiesProvider({ children }) {
   async function deleteCity(id) {
     dispatch({ type: "loading" });
     try {
-      await fetch(`${BASE_URL}/cities/${id}`, {
-        method: "DELETE",
-      });
+      // await fetch(`${BASE_URL}/cities/${id}`, {
+      //   method: "DELETE",
+      // });
+      await deleteDoc(doc(db, "cities", id));
       dispatch({ type: "city/deleted", payload: id });
     } catch {
       dispatch({ type: "rejected", payload: "Error for Deleting City..." });
