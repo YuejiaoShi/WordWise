@@ -7,7 +7,7 @@ import {
 } from "react";
 
 import { database } from "./firebaseConfig";
-import { ref, get, set, push, remove } from "firebase/database";
+import { ref, get, push, remove } from "firebase/database";
 
 /* eslint-disable react/prop-types */
 // const BASE_URL =  "https://word-wise-five.vercel.app:8000";
