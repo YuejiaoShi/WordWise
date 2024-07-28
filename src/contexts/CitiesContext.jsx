@@ -163,8 +163,18 @@ function CitiesProvider({ children }) {
       //   method: "DELETE",
       // });
       // dispatch({ type: "city/deleted", payload: id });
-      const cityRef = ref(database, `cities/${id}`);
-      await remove(cityRef);
+      const citiesRef = ref(database, "cities");
+      const snapshot = await get(citiesRef);
+      const currentCities = snapshot.val();
+      const cityKey = Object.keys(currentCities).find(
+        (key) => currentCities[key].id === id
+      );
+
+      if (!cityKey) {
+        throw new Error("City not found");
+      }
+      await remove(ref(database, `cities/${cityKey}`));
+
       dispatch({ type: "city/deleted", payload: id });
     } catch {
       dispatch({ type: "rejected", payload: "Error for Deleting City..." });
